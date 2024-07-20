@@ -4,3 +4,4 @@ backups/output.log
 /*.log
 .idea
 node_modules
+.env

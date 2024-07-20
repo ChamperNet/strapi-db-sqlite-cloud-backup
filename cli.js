@@ -23,6 +23,7 @@ program
     const destinationPath = path.resolve(cwd, '.env')
     const backupDir = path.resolve(cwd, 'backups')
     const ecosystemPath = path.resolve(cwd, 'ecosystem.config.js')
+    const gitignorePath = path.resolve(cwd, '.gitignore')
 
     // Create .env file
     if (!fs.existsSync(destinationPath)) {
@@ -62,6 +63,23 @@ module.exports = {
       console.log('ecosystem.config.js file has been created.')
     } else {
       console.log('ecosystem.config.js file already exists.')
+    }
+
+    // Create .gitignore
+    if (!fs.existsSync(gitignorePath)) {
+      const gitignoreContent = `
+backups
+backups/errors.log
+backups/output.log
+/*.log
+.idea
+node_modules
+.env
+      `
+      fs.writeFileSync(gitignorePath, gitignoreContent.trim())
+      console.log('.gitignore file has been created.')
+    } else {
+      console.log('.gitignore file already exists.')
     }
   })
 
