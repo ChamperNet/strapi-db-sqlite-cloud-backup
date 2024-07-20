@@ -3,3 +3,4 @@ backups/errors.log
 backups/output.log
 /*.log
 .idea
+node_modules

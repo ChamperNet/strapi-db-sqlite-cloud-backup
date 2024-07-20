@@ -16,7 +16,7 @@ When you run the `npm run backup` command, it initiates the execution of the `ba
 
 4. **Uploading the backup to cloud storage (Google Drive and Yandex Disk):**
    - If the environment variables `GOOGLE_DRIVE_ENABLED` and `YANDEX_DISK_ENABLED` are set to `true`, the backup is uploaded to the respective cloud storage services.
-   - Log messages about the process and the result of the upload are recorded.
+   - Log messages about the process and the result of the upload is recorded.
 
 5. **Managing the number of backups:**
    - The number of backups in the backup directory is checked.
