@@ -45,7 +45,7 @@ jobs:
           git commit -m "Bump version to $(node -p -e "require('./package.json').version")"
           git tag v$(node -p -e "require('./package.json').version")
           git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
-          git push origin main --follow-tags
+          git push origin HEAD:main --follow-tags
 
       - name: Publish package to NPM 📦
         env:
