@@ -51,18 +51,24 @@ const logger = winston.createLogger({
   ]
 })
 
+logger.info('Starting backup process...')
+
 // Maximum number of backups
 const MAX_BACKUPS = 24
 
 // Function to create a database backup
 export function backupDatabase () {
+  logger.info('Backup database function started.')
+
   // Проверка наличия переменных окружения
   if (!process.env.DB_PATH || !process.env.DB_NAME) {
+    logger.error('DB_PATH and DB_NAME must be defined in .env file')
     throw new Error('DB_PATH and DB_NAME must be defined in .env file')
   }
 
   // Database path
   const dbPath = path.resolve(__dirname, process.env.DB_PATH, process.env.DB_NAME)
+  logger.info(`Database path: ${ dbPath }`)
 
   fs.copyFile(dbPath, backupPath, (err) => {
     if (err) {
@@ -184,6 +190,7 @@ async function uploadToYandexDisk () {
 
 // Function to manage the number of backups
 function manageBackups () {
+  logger.info('Managing backups...')
   fs.readdir(backupDir, (err, files) => {
     if (err) {
       logger.error(`Error reading backup directory: ${ err }`)
@@ -212,6 +219,7 @@ function manageBackups () {
 
 // Starting a backup when running a script
 if (process.argv.includes('run')) {
+  logger.info('Running backup script with "run" parameter.')
   // If the script is launched with the "run" parameter, we perform a one-time copy
   backupDatabase()
 }
