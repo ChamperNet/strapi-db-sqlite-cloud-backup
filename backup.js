@@ -10,10 +10,10 @@ import axios from 'axios'
 import winston from 'winston'
 import { config } from 'dotenv'
 
-// Loading environment variables from the .env file
+// Загружаем переменные окружения из .env файла
 config()
 
-// Get the current working directory
+// Получаем текущий рабочий каталог
 const cwd = process.cwd()
 
 // Path for temporary storage of the backup copy
@@ -213,11 +213,4 @@ function manageBackups () {
       })
     }
   })
-}
-
-// Starting a backup when running a script
-if (process.argv.includes('run')) {
-  logger.info('Running backup script with "run" parameter.')
-  // If the script is launched with the "run" parameter, we perform a one-time copy
-  backupDatabase()
 }
