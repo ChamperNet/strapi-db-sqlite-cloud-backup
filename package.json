@@ -1,5 +1,5 @@
 {
-  "name": "backup",
+  "name": "strapi-db-sqlite-cloud-backup",
   "private": true,
   "version": "0.0.7",
   "description": "Backup script for Strapi & Nuxt",
