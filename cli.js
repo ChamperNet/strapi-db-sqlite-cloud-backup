@@ -3,13 +3,8 @@
 import { Command } from 'commander'
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import { config } from 'dotenv'
 import { backupDatabase } from './backup.js'
-
-// Получаем путь к текущему файлу и директории
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 const program = new Command()
 program.version('1.0.0')
@@ -18,9 +13,10 @@ program
   .command('init')
   .description('Initialize the backup configuration')
   .action(() => {
+    const cwd = process.cwd()
     const templatePath = path.resolve(__dirname, 'template.env')
-    const destinationPath = path.resolve(process.cwd(), '.env')
-    const backupDir = path.resolve(process.cwd(), 'backups')
+    const destinationPath = path.resolve(cwd, '.env')
+    const backupDir = path.resolve(cwd, 'backups')
 
     if (!fs.existsSync(destinationPath)) {
       fs.copyFileSync(templatePath, destinationPath)
@@ -43,7 +39,8 @@ program
   .description('Run the backup script')
   .action(() => {
     console.log('Running the backup script...')
-    config({ path: path.resolve(process.cwd(), '.env') }) // Load .env variables from the current working directory
+    const cwd = process.cwd()
+    config({ path: path.resolve(cwd, '.env') }) // Load .env variables from the current working directory
     backupDatabase() // Run backup
   })
 

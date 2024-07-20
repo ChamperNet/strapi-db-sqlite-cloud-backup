@@ -5,16 +5,15 @@
  */
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import { google } from 'googleapis'
 import axios from 'axios'
 import winston from 'winston'
 import { config } from 'dotenv'
 
-// Загружаем переменные окружения из .env файла
+// Loading environment variables from the .env file
 config()
 
-// Получаем путь к текущему рабочему каталогу
+// Get the current working directory
 const cwd = process.cwd()
 
 // Path for temporary storage of the backup copy
