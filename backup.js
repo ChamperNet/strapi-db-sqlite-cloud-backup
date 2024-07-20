@@ -14,12 +14,11 @@ import { config } from 'dotenv'
 // Загружаем переменные окружения из .env файла
 config()
 
-// Получаем путь к текущему файлу и директории
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// Получаем путь к текущему рабочему каталогу
+const cwd = process.cwd()
 
 // Path for temporary storage of the backup copy
-const backupDir = path.resolve(__dirname, 'backups')
+const backupDir = path.resolve(cwd, 'backups')
 if (!fs.existsSync(backupDir)) {
   fs.mkdirSync(backupDir, { recursive: true })
 }
@@ -67,7 +66,7 @@ export function backupDatabase () {
   }
 
   // Database path
-  const dbPath = path.resolve(__dirname, process.env.DB_PATH, process.env.DB_NAME)
+  const dbPath = path.resolve(cwd, process.env.DB_PATH, process.env.DB_NAME)
   logger.info(`Database path: ${ dbPath }`)
 
   fs.copyFile(dbPath, backupPath, (err) => {
@@ -102,7 +101,7 @@ function uploadToGoogleDrive () {
     return
   }
 
-  const GOOGLE_CREDENTIALS = JSON.parse(fs.readFileSync(path.resolve(__dirname, GOOGLE_CREDENTIALS_PATH)))
+  const GOOGLE_CREDENTIALS = JSON.parse(fs.readFileSync(path.resolve(cwd, GOOGLE_CREDENTIALS_PATH)))
 
   const auth = new google.auth.GoogleAuth({
     credentials: GOOGLE_CREDENTIALS,

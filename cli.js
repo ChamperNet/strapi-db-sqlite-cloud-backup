@@ -43,7 +43,7 @@ program
   .description('Run the backup script')
   .action(() => {
     console.log('Running the backup script...')
-    config() // Load .env variables
+    config({ path: path.resolve(process.cwd(), '.env') }) // Load .env variables from the current working directory
     backupDatabase() // Run backup
   })
 
