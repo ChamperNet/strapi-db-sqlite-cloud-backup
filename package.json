@@ -1,6 +1,6 @@
 {
   "name": "strapi-db-sqlite-cloud-backup",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Backup script for Strapi SQLite DB file",
   "type": "module",
   "scripts": {

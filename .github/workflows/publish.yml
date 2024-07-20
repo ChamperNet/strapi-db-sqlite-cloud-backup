@@ -28,7 +28,7 @@ jobs:
       - name: Configure git
         run: |
           git config --global user.email "info@champer.ru"
-          git config --global user.name "Your Name"
+          git config --global user.name "Timur Iskakov"
 
       - name: Commit all changes
         run: |
@@ -42,7 +42,6 @@ jobs:
           npm version patch -m "Bump version to %s"
           git add .
           git commit -m "Bump version to $(node -p -e "require('./package.json').version")"
-          git push origin main
 
       - name: Push changes
         env:
