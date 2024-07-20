@@ -1,7 +1,6 @@
 {
   "name": "strapi-db-sqlite-cloud-backup",
-  "private": true,
-  "version": "0.0.7",
+  "version": "0.1.1",
   "description": "Backup script for Strapi & Nuxt",
   "type": "module",
   "scripts": {
@@ -15,6 +14,7 @@
     "googleapis": "^140.0.1",
     "winston": "^3.13.1"
   },
+  "keywords": ["strapi", "backup", "sqlite", "nodejs", "pm2", "yandex-disk", "google-drive"],
   "author": {
     "name": "Champer",
     "website": "champer.ru"
