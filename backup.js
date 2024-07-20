@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename)
 
 // Path for temporary storage of the backup copy
 const backupDir = path.resolve(__dirname, 'backups')
+if (!fs.existsSync(backupDir)) {
+  fs.mkdirSync(backupDir, { recursive: true })
+}
 const backupPath = path.resolve(backupDir, `backup-${ Date.now() }.db`)
 
 // Paths to log files
@@ -60,11 +63,6 @@ export function backupDatabase () {
 
   // Database path
   const dbPath = path.resolve(__dirname, process.env.DB_PATH, process.env.DB_NAME)
-
-  // Make sure the backup directory exists
-  if (!fs.existsSync(backupDir)) {
-    fs.mkdirSync(backupDir, { recursive: true })
-  }
 
   fs.copyFile(dbPath, backupPath, (err) => {
     if (err) {
