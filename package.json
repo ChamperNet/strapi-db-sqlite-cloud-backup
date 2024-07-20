@@ -1,20 +1,33 @@
 {
   "name": "strapi-db-sqlite-cloud-backup",
-  "version": "0.1.4",
+  "version": "0.2.1",
   "description": "Backup script for Strapi SQLite DB file",
   "type": "module",
+  "main": "backup.js",
+  "bin": {
+    "strapi-db-sqlite-cloud-backup": "./cli.js"
+  },
   "scripts": {
-    "backup": "pm2 start ecosystem.config.js",
-    "backup:run": "node backup.js run"
+    "backup:run": "node backup.js run",
+    "backup:start": "pm2 start ecosystem.config.js"
   },
   "dependencies": {
     "axios": "^1.7.2",
+    "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "fs": "^0.0.1-security",
     "googleapis": "^140.0.1",
     "winston": "^3.13.1"
   },
-  "keywords": ["strapi", "backup", "sqlite", "nodejs", "pm2", "yandex-disk", "google-drive"],
+  "keywords": [
+    "strapi",
+    "backup",
+    "sqlite",
+    "nodejs",
+    "pm2",
+    "yandex-disk",
+    "google-drive"
+  ],
   "author": {
     "name": "Champer",
     "website": "champer.ru"

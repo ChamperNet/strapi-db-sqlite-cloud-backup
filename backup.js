@@ -11,10 +11,10 @@ import axios from 'axios'
 import winston from 'winston'
 import { config } from 'dotenv'
 
-// Loading environment variables from the .env file
+// Загружаем переменные окружения из .env файла
 config()
 
-// Get the path to the current file and directory
+// Получаем путь к текущему файлу и директории
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -55,7 +55,7 @@ const logger = winston.createLogger({
 const MAX_BACKUPS = 24
 
 // Function to create a database backup
-function backupDatabase () {
+export function backupDatabase () {
   // Make sure the backup directory exists
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true })
@@ -167,7 +167,7 @@ async function uploadToYandexDisk () {
   }
 }
 
-// Функция для управления количеством резервных копий
+// Function to manage the number of backups
 function manageBackups () {
   fs.readdir(backupDir, (err, files) => {
     if (err) {
