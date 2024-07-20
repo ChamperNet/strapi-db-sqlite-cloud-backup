@@ -33,6 +33,29 @@ YANDEX_BACKUP_PATH=/backups
 DB_PATH=../backend/.tmp
 DB_NAME=data.db
 ```
+
+This will also create an `ecosystem.config.js` file and fill it with that:
+
+```js
+module.exports = {
+  apps: [
+    {
+      name: 'backup',
+      script: 'node_modules/strapi-db-sqlite-cloud-backup/backup.js',
+      args: 'run',
+      cron_restart: '0 */3 * * *', // Run every 3 hours
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      }
+    }
+  ]
+};
+
+```
+
+Change the backup timeout value if needed.
+
 ## Usage
 To run the backup script manually, use the `run` command:
 

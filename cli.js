@@ -17,7 +17,9 @@ program
     const templatePath = path.resolve(__dirname, 'template.env')
     const destinationPath = path.resolve(cwd, '.env')
     const backupDir = path.resolve(cwd, 'backups')
+    const ecosystemPath = path.resolve(cwd, 'ecosystem.config.js')
 
+    // Create .env file
     if (!fs.existsSync(destinationPath)) {
       fs.copyFileSync(templatePath, destinationPath)
       console.log('.env file has been created. Please fill in the required values.')
@@ -31,6 +33,30 @@ program
       console.log('Backups directory has been created.')
     } else {
       console.log('Backups directory already exists.')
+    }
+
+    // Create ecosystem.config.js
+    if (!fs.existsSync(ecosystemPath)) {
+      const ecosystemConfig = `
+module.exports = {
+  apps: [
+    {
+      name: 'backup',
+      script: 'node_modules/strapi-db-sqlite-cloud-backup/backup.js',
+      args: 'run',
+      cron_restart: '0 */3 * * *', // Run every 3 hours
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      }
+    }
+  ]
+};
+      `
+      fs.writeFileSync(ecosystemPath, ecosystemConfig.trim())
+      console.log('ecosystem.config.js file has been created.')
+    } else {
+      console.log('ecosystem.config.js file already exists.')
     }
   })
 
