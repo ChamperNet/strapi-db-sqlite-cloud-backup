@@ -31,8 +31,11 @@ jobs:
           git config --global user.email "info@champer.ru"
           git config --global user.name "Timur Iskakov"
 
+      - name: Configure npm for authentication
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_PUBLICATION_TOKEN }}" > ~/.npmrc
+
       - name: Publish package to NPM 📦
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLICATION_TOKEN }}
         run: |
           npm publish --access public
