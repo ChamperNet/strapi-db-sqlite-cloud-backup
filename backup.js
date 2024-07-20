@@ -18,14 +18,6 @@ config()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Проверка наличия переменных окружения
-if (!process.env.DB_PATH || !process.env.DB_NAME) {
-  throw new Error('DB_PATH and DB_NAME must be defined in .env file')
-}
-
-// Database path
-const dbPath = path.resolve(__dirname, process.env.DB_PATH, process.env.DB_NAME)
-
 // Path for temporary storage of the backup copy
 const backupDir = path.resolve(__dirname, 'backups')
 const backupPath = path.resolve(backupDir, `backup-${ Date.now() }.db`)
@@ -61,6 +53,14 @@ const MAX_BACKUPS = 24
 
 // Function to create a database backup
 export function backupDatabase () {
+  // Проверка наличия переменных окружения
+  if (!process.env.DB_PATH || !process.env.DB_NAME) {
+    throw new Error('DB_PATH and DB_NAME must be defined in .env file')
+  }
+
+  // Database path
+  const dbPath = path.resolve(__dirname, process.env.DB_PATH, process.env.DB_NAME)
+
   // Make sure the backup directory exists
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true })
