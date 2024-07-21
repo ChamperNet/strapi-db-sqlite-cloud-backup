@@ -56,7 +56,16 @@ program
 
     // Create .gitignore
     if (!fs.existsSync(gitignorePath)) {
-      fs.copyFileSync(gitignoreTemplate, gitignorePath)
+      const gitignoreContent = `
+backups
+backups/errors.log
+backups/output.log
+/*.log
+.idea
+node_modules
+.env
+      `
+      fs.writeFileSync(gitignorePath, gitignoreContent.trim())
       console.log('.gitignore file has been created.')
     } else {
       console.log('.gitignore file already exists.')
