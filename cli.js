@@ -52,6 +52,7 @@ module.exports = {
       args: 'run',
       cron_restart: '0 */3 * * *', // Run every 3 hours
       watch: false,
+      env: require('dotenv').config().parsed,
       env: {
         NODE_ENV: 'production'
       }
