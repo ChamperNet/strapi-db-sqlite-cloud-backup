@@ -227,4 +227,5 @@ function manageBackups () {
 // Run the backup function if the file is executed directly
 if (process.argv.includes('run')) {
   logger.info('Running the backup script via pm2...')
+  backupDatabase()
 }
