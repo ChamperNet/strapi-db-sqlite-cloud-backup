@@ -226,8 +226,5 @@ function manageBackups () {
 
 // Run the backup function if the file is executed directly
 if (process.argv.includes('run')) {
-  logger.info('Running the backup script via pm2...');
-} else if (process.argv.includes('once')) {
-  logger.info('Running a one-time backup...');
-  backupDatabase();
+  logger.info('Running the backup script via pm2...')
 }

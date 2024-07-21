@@ -19,15 +19,20 @@ program
   .description('Initialize the backup configuration')
   .action(() => {
     const cwd = process.cwd()
-    const templatePath = path.resolve(__dirname, 'template.env')
-    const destinationPath = path.resolve(cwd, '.env')
     const backupDir = path.resolve(cwd, 'backups')
+
+    const templateEnvPath = path.resolve(__dirname, 'template.env')
+    const destinationEnvPath = path.resolve(cwd, '.env')
+
+    const ecosystemTemplate = path.resolve(__dirname, 'ecosystem.config.js')
     const ecosystemPath = path.resolve(cwd, 'ecosystem.config.js')
+
+    const gitignoreTemplate = path.resolve(__dirname, '.gitignore')
     const gitignorePath = path.resolve(cwd, '.gitignore')
 
     // Create .env file
-    if (!fs.existsSync(destinationPath)) {
-      fs.copyFileSync(templatePath, destinationPath)
+    if (!fs.existsSync(destinationEnvPath)) {
+      fs.copyFileSync(templateEnvPath, destinationEnvPath)
       console.log('.env file has been created. Please fill in the required values.')
     } else {
       console.log('.env file already exists.')
@@ -43,29 +48,7 @@ program
 
     // Create ecosystem.config.js
     if (!fs.existsSync(ecosystemPath)) {
-      const ecosystemConfig = `
-const dotenv = require('dotenv');
-const path = require('path');
-
-dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-module.exports = {
-  apps: [
-    {
-      name: 'backup',
-      script: 'node_modules/strapi-db-sqlite-cloud-backup/backup.js',
-      args: 'run',
-      cron_restart: '0 */3 * * *', // Run every 3 hours
-      watch: false,
-      env: {
-        ...process.env,
-        NODE_ENV: 'production'
-      }
-    }
-  ]
-};
-      `
-      fs.writeFileSync(ecosystemPath, ecosystemConfig.trim())
+      fs.copyFileSync(ecosystemTemplate, ecosystemPath)
       console.log('ecosystem.config.js file has been created.')
     } else {
       console.log('ecosystem.config.js file already exists.')
@@ -73,16 +56,7 @@ module.exports = {
 
     // Create .gitignore
     if (!fs.existsSync(gitignorePath)) {
-      const gitignoreContent = `
-backups
-backups/errors.log
-backups/output.log
-/*.log
-.idea
-node_modules
-.env
-      `
-      fs.writeFileSync(gitignorePath, gitignoreContent.trim())
+      fs.copyFileSync(gitignoreTemplate, gitignorePath)
       console.log('.gitignore file has been created.')
     } else {
       console.log('.gitignore file already exists.')
