@@ -44,6 +44,11 @@ program
     // Create ecosystem.config.js
     if (!fs.existsSync(ecosystemPath)) {
       const ecosystemConfig = `
+const dotenv = require('dotenv');
+const path = require('path');
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
 module.exports = {
   apps: [
     {
@@ -52,8 +57,8 @@ module.exports = {
       args: 'run',
       cron_restart: '0 */3 * * *', // Run every 3 hours
       watch: false,
-      env: require('dotenv').config().parsed,
       env: {
+        ...process.env,
         NODE_ENV: 'production'
       }
     }

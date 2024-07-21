@@ -10,10 +10,10 @@ import axios from 'axios'
 import winston from 'winston'
 import { config } from 'dotenv'
 
-// Загружаем переменные окружения из .env файла
+// Load environment variables from the .env file
 config()
 
-// Получаем текущий рабочий каталог
+// Get the current working directory
 const cwd = process.cwd()
 
 // Path for temporary storage of the backup copy
@@ -38,14 +38,14 @@ const logFormat = winston.format.printf(({ timestamp, level, message, ...metadat
 
 // Logger initialization
 const logger = winston.createLogger({
-  level: 'info',
+  level: 'debug', // Set to 'debug' to see all messages
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     logFormat
   ),
   transports: [
     new winston.transports.File({ filename: errorLogPath, level: 'error' }),
-    new winston.transports.File({ filename: outputLogPath, level: 'info' })
+    new winston.transports.File({ filename: outputLogPath, level: 'debug' }) // Set to 'debug' to see all messages
   ]
 })
 
@@ -59,6 +59,8 @@ export function backupDatabase () {
   logger.info('Backup database function started.')
 
   // Проверка наличия переменных окружения
+  logger.debug(`DB_PATH: ${ process.env.DB_PATH }`)
+  logger.debug(`DB_NAME: ${ process.env.DB_NAME }`)
   if (!process.env.DB_PATH || !process.env.DB_NAME) {
     logger.error('DB_PATH and DB_NAME must be defined in .env file')
     throw new Error('DB_PATH and DB_NAME must be defined in .env file')
@@ -78,10 +80,12 @@ export function backupDatabase () {
 
     // Upload to cloud storage
     if (process.env.GOOGLE_DRIVE_ENABLED === 'true') {
+      logger.info('Uploading to Google Drive...')
       uploadToGoogleDrive()
     }
 
     if (process.env.YANDEX_DISK_ENABLED === 'true') {
+      logger.info('Uploading to Yandex Disk...')
       uploadToYandexDisk()
     }
 
@@ -94,6 +98,9 @@ export function backupDatabase () {
 function uploadToGoogleDrive () {
   const GOOGLE_DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID
   const GOOGLE_CREDENTIALS_PATH = process.env.GOOGLE_CREDENTIALS_PATH
+
+  logger.debug(`GOOGLE_DRIVE_FOLDER_ID: ${ GOOGLE_DRIVE_FOLDER_ID }`)
+  logger.debug(`GOOGLE_CREDENTIALS_PATH: ${ GOOGLE_CREDENTIALS_PATH }`)
 
   if (!GOOGLE_DRIVE_FOLDER_ID || !GOOGLE_CREDENTIALS_PATH) {
     logger.error('Google Drive folder ID and credentials path must be defined in .env file')
@@ -142,6 +149,8 @@ async function uploadToYandexDisk () {
 
   // Path to file on the cloud
   const cloudPath = process.env.YANDEX_BACKUP_PATH
+
+  logger.debug(`YANDEX_BACKUP_PATH: ${ cloudPath }`)
 
   if (!YANDEX_TOKEN || !cloudPath) {
     logger.error('Yandex Disk token and backup path must be defined in .env file')
@@ -213,4 +222,12 @@ function manageBackups () {
       })
     }
   })
+}
+
+// Run the backup function if the file is executed directly
+if (process.argv.includes('run')) {
+  logger.info('Running the backup script via pm2...');
+} else if (process.argv.includes('once')) {
+  logger.info('Running a one-time backup...');
+  backupDatabase();
 }
