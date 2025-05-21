@@ -89,6 +89,7 @@ The logic that this script follows includes several key steps:
 4. Uploading the backup to cloud storage (Google Drive and Yandex Disk):
 
    - If the environment variables `GOOGLE_DRIVE_ENABLED` and `YANDEX_DISK_ENABLED` are set to true, the backup is uploaded to the respective cloud storage services.
+   - If the `MAX_BACKUPS` value is less than the number of existing in the cloud backups, old ones would be deleted for Yandex Disk.
    - Log messages about the process and the result of the upload is recorded.
    
 
