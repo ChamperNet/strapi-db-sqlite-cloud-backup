@@ -146,56 +146,44 @@ function uploadToGoogleDrive() {
 }
 
 // Function for uploading a file to Yandex Disk
-async function uploadToYandexDisk() {
-  const YANDEX_TOKEN = process.env.YANDEX_TOKEN;
-  const fileName = path.basename(backupPath);
+// Функция для загрузки и управления бэкапами на Яндекс.Диске
+async function uploadToYandexDisk () {
+  const YANDEX_TOKEN = process.env.YANDEX_TOKEN
+  const fileName = path.basename(backupPath)
+  const cloudPath = process.env.YANDEX_BACKUP_PATH
 
-  // Path to file on the cloud
-  const cloudPath = process.env.YANDEX_BACKUP_PATH;
-
-  logger.debug(`YANDEX_BACKUP_PATH: ${cloudPath}`);
+  logger.debug(`[YANDEX] Backup path: ${cloudPath}`)
 
   if (!YANDEX_TOKEN || !cloudPath) {
-    logger.error(
-      'Yandex Disk token and backup path must be defined in .env file');
-    return;
+    logger.error('Yandex Disk token and backup path must be defined in .env file')
+    return
+  }
+
+  // Getting all backups from Yandex Disk
+  async function getAllYandexBackups () {
+    const allItems = []
+    let nextHref = `https://cloud-api.yandex.net/v1/disk/resources?path=${encodeURIComponent(cloudPath)}&limit=1000`
+
+    while (nextHref) {
+      const response = await axios.get(nextHref, {
+        headers: { Authorization: `OAuth ${YANDEX_TOKEN}` }
+      })
+
+      const embedded = response.data._embedded
+      const items = embedded?.items || []
+      allItems.push(...items)
+
+      nextHref = embedded?.next || null
+    }
+
+    return allItems.filter(item =>
+      item.name.startsWith('backup-') && item.name.endsWith('.db')
+    )
   }
 
   try {
-
-    // Getting all the existing backups in the directory
-    const listResponse = await axios.get(
-      'https://cloud-api.yandex.net/v1/disk/resources', {
-        params: { path: cloudPath },
-        headers: { Authorization: `OAuth ${YANDEX_TOKEN}` },
-      });
-
-    const allBackups = listResponse.data._embedded?.items?.filter(item =>
-      item.name.startsWith('backup-') && item.name.endsWith('.db'),
-    ) || [];
-
-    logger.info(`Found ${allBackups.length} backups on Yandex Disk`);
-
-    // Deleting all the old backups files in this folder
-    if (allBackups.length >= MAX_BACKUPS) {
-      const sorted = allBackups.sort((a, b) => new Date(a.created) - new Date(b.created))
-      const toDelete = sorted.slice(0, allBackups.length - MAX_BACKUPS + 1) // +1 for the new one
-
-      for (const file of toDelete) {
-        try {
-          await axios.delete('https://cloud-api.yandex.net/v1/disk/resources', {
-            params: { path: `${cloudPath}/${file.name}` },
-            headers: { Authorization: `OAuth ${YANDEX_TOKEN}` }
-          })
-          logger.info(`Deleted old backup from Yandex Disk: ${file.name}`)
-        } catch (err) {
-          logger.error(`Failed to delete old backup ${file.name}: ${err.message}`)
-        }
-      }
-    }
-
-    // Getting the download URL
-    const response = await axios.get(
+    // Getting upload URL
+    const uploadUrlRes = await axios.get(
       'https://cloud-api.yandex.net/v1/disk/resources/upload', {
         params: {
           path: `${cloudPath}/${fileName}`,
@@ -204,34 +192,56 @@ async function uploadToYandexDisk() {
         headers: {
           Authorization: `OAuth ${YANDEX_TOKEN}`,
         },
-      });
+      })
 
-    if (response.status !== 200) {
-      throw new Error(`Unexpected response status: ${response.status}`);
+    if (uploadUrlRes.status !== 200) {
+      throw new Error(`Unexpected response status: ${uploadUrlRes.status}`)
     }
 
-    const uploadUrl = response.data.href;
+    const uploadUrl = uploadUrlRes.data.href
 
-    // Uploading a file
-    const fileStream = fs.createReadStream(backupPath);
+    // Uploading the file
+    const fileStream = fs.createReadStream(backupPath)
     const uploadResponse = await axios.put(uploadUrl, fileStream, {
       headers: {
         'Content-Type': 'application/x-sqlite3',
       },
-    });
+    })
 
-    if (uploadResponse.status !== 201) {
-      throw new Error(
-        `Unexpected upload response status: ${uploadResponse.status}`);
+    if (uploadResponse.status !== 201 && uploadResponse.status !== 200) {
+      throw new Error(`Unexpected upload response status: ${uploadResponse.status}`)
     }
 
-    logger.info('File uploaded to Yandex Disk');
+    logger.info(`[YANDEX] File uploaded successfully: ${fileName}`)
+
+    // Manage backups
+    const allBackups = await getAllYandexBackups()
+    logger.info(`[YANDEX] Found ${allBackups.length} backups on Yandex Disk`)
+
+    if (allBackups.length > MAX_BACKUPS) {
+      const sorted = allBackups.sort((a, b) => new Date(a.created) - new Date(b.created))
+      const toDelete = sorted.slice(0, allBackups.length - MAX_BACKUPS)
+
+      for (const file of toDelete) {
+        try {
+          await axios.delete('https://cloud-api.yandex.net/v1/disk/resources', {
+            params: { path: `${cloudPath}/${file.name}` },
+            headers: { Authorization: `OAuth ${YANDEX_TOKEN}` }
+          })
+          logger.info(`[YANDEX] Deleted old backup: ${file.name}`)
+        } catch (err) {
+          logger.error(`[YANDEX] Failed to delete ${file.name}: ${err.message}`)
+        }
+      }
+    }
+
   } catch (err) {
-    logger.error(`Error uploading file to Yandex Disk: ${err.message}`, {
-      response: err.response ? err.response.data : null,
-    });
+    logger.error(`[YANDEX] Error uploading backup: ${err.message}`, {
+      response: err.response?.data || null
+    })
   }
 }
+
 
 // Function to manage the number of backups
 function manageBackups() {
